@@ -42,8 +42,17 @@ Node.js 와 Chrome(없으면 Edge)이 필요하다. 별도 이미지 도구는 �
 
 ## 아이콘 목록
 
-**종류** — `ci` `cd` `client` `server` `lod`
-**상태** — `success` `unstable` `warning` `failed` `aborted`
+**종류** (시작 카드) — `ci` `cd` `client` `server` `lod` `data` `script` `navmesh`
+`localize` `test` `merge` `ddc` `perforce` `serverExec` `default`
+
+**상태** (종료 댓글) — `success` `unstable` `warning` `failed` `aborted`
+
+`default` 는 종류를 특정하지 못했을 때 떨어지는 자리다. 새 종류를 넣기 전까지
+그 자리를 메운다.
+
+색은 두 번째 단서다. 종류를 가르는 것은 모양이고, 색은 채널을 훑을 때 덩어리로
+먼저 눈에 들어오게 하는 역할이다. 그래서 색상환에서 되도록 벌려 잡되 완전한 중복
+회피에 매달리지 않는다.
 
 ## 사용 크기
 

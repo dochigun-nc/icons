@@ -70,6 +70,94 @@ const GLYPHS = {
       <path d="M24 24 V38.5"/>
     </g>`,
 
+  // 실린더 — 데이터
+  data: `
+    <g ${S} stroke-width="3.2">
+      <ellipse cx="24" cy="15" rx="11" ry="4.6"/>
+      <path d="M13 15 V33 c0 2.54 4.92 4.6 11 4.6 s11 -2.06 11 -4.6 V15"/>
+      <path d="M13 24 c0 2.54 4.92 4.6 11 4.6 s11 -2.06 11 -4.6"/>
+    </g>`,
+
+  // 꺾쇠 + 슬래시 — 스크립트
+  script: `
+    <g ${S} stroke-width="3.8">
+      <path d="M18 17 L10.5 24 L18 31"/>
+      <path d="M30 17 L37.5 24 L30 31"/>
+      <path d="M27 14 L21 34"/>
+    </g>`,
+
+  // 노드를 잇는 경로 — 내비게이션 메시.
+  // 삼각형 격자로 그리면 warning 의 삼각형과 32px 에서 헷갈려서 경로 형태로 간다.
+  navmesh: `
+    <g ${S} stroke-width="3.2">
+      <path d="M12 33 L20 21 L28 27 L36 15"/>
+    </g>
+    <g fill="currentColor">
+      <circle cx="12" cy="33" r="3.4"/>
+      <circle cx="36" cy="15" r="3.4"/>
+    </g>`,
+
+  // 지구본 — 현지화
+  localize: `
+    <g ${S} stroke-width="3.2">
+      <circle cx="24" cy="24" r="13"/>
+      <ellipse cx="24" cy="24" rx="5.4" ry="13"/>
+      <path d="M11.6 19.8 H36.4"/>
+      <path d="M11.6 28.2 H36.4"/>
+    </g>`,
+
+  // 플라스크 — 테스트
+  test: `
+    <g ${S} stroke-width="3.2">
+      <path d="M19 11 V21 L12 35 H36 L29 21 V11"/>
+      <path d="M16.5 11 H31.5"/>
+      <path d="M15.5 28 H32.5"/>
+    </g>`,
+
+  // 곁가지가 본류로 합쳐지는 형태 — 머지
+  merge: `
+    <g ${S} stroke-width="3.4">
+      <path d="M16 15 V33"/>
+      <path d="M32 18 v3 c0 6 -7 8 -16 8"/>
+    </g>
+    <g fill="currentColor">
+      <circle cx="16" cy="13" r="3.6"/>
+      <circle cx="16" cy="35" r="3.6"/>
+      <circle cx="32" cy="15" r="3.6"/>
+    </g>`,
+
+  // 겹친 판 — 캐시. lod 의 육면체와 실루엣이 갈리도록 마름모를 쓴다.
+  ddc: `
+    <g ${S} stroke-width="3">
+      <path d="M24 9.5 L38 16.5 L24 23.5 L10 16.5 Z"/>
+      <path d="M10 24 L24 31 L38 24"/>
+      <path d="M10 31 L24 38 L38 31"/>
+    </g>`,
+
+  // 아카이브 상자 — 체크포인트/저널/복원
+  perforce: `
+    <g ${S} stroke-width="3.2">
+      <rect x="9.5" y="12" width="29" height="8" rx="2.5"/>
+      <path d="M12 20 V34 c0 1.7 1.3 3 3 3 h18 c1.7 0 3 -1.3 3 -3 V20"/>
+      <path d="M20 27 H28"/>
+    </g>`,
+
+  // 전원 버튼 — 서버 기동/정지
+  serverExec: `
+    <g ${S} stroke-width="3.6">
+      <path d="M24 11 V24"/>
+      <path d="M32.5 15.5 a12 12 0 1 1 -17 0"/>
+    </g>`,
+
+  // 중립. 종류를 특정하지 못했을 때 떨어지는 자리다.
+  default: `
+    <g fill="currentColor">
+      <rect x="12" y="12" width="10" height="10" rx="2.6"/>
+      <rect x="26" y="12" width="10" height="10" rx="2.6"/>
+      <rect x="12" y="26" width="10" height="10" rx="2.6"/>
+      <rect x="26" y="26" width="10" height="10" rx="2.6"/>
+    </g>`,
+
   // --- 상태: 종료 댓글 헤더에 쓴다 -----------------------------------------
 
   // 체크 — 성공
@@ -112,8 +200,22 @@ const GLYPHS = {
     </g>`,
 };
 
+/**
+ * 색은 두 번째 단서다. 종류를 가르는 것은 어디까지나 모양이고, 색은 채널을 훑을 때
+ * 덩어리로 먼저 눈에 들어오게 하는 역할이다. 그래서 색상환에서 되도록 벌려 잡되
+ * 완전한 중복 회피에 매달리지 않는다 — 모양이 확실히 다르고 같은 화면에 잘 나오지
+ * 않는 조합이면 비슷한 색을 써도 실사용에서 헷갈리지 않는다.
+ *
+ * 알아둘 것: merge 의 크림슨과 failed 의 빨강이 가깝다. 종류는 시작 카드,
+ * 상태는 종료 댓글에 붙으므로 한 카드에 같이 나오지 않는다.
+ */
 const COLORS = {
+  // 종류
   ci: '#2F6FED', cd: '#7A4FE0', client: '#12A594', server: '#C2410C', lod: '#D6336C',
+  data: '#0E7490', script: '#4338CA', navmesh: '#15803D', localize: '#A21CAF',
+  test: '#4D7C0F', merge: '#BE123C', ddc: '#A16207', perforce: '#475569',
+  serverExec: '#9A3412', default: '#6B7280',
+  // 상태
   success: '#1F9D55', unstable: '#E8A317', warning: '#E8730C',
   failed: '#E5484D', aborted: '#6B7280',
 };
