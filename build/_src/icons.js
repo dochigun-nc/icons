@@ -3,10 +3,14 @@
  * 아이콘 원본 정의.
  *
  * 글리프는 48x48 viewBox, 중심 (24,24) 기준으로 그린다. 색은 currentColor 로 두어
- * 스타일 A(색 판 + 흰 글리프)와 D(글리프만 컬러)가 같은 정의를 공유한다.
+ * 배지가 글리프를 흰색으로 덮어쓸 수 있게 한다.
  *
  * 이 파일이 유일한 원본이다. PNG 를 직접 고치지 말고 여기를 고친 뒤
  * Build-Icons.ps1 로 다시 뽑는다.
+ *
+ * 스타일은 하나다 — 색으로 채운 둥근 사각 배지 + 흰 글리프. 배경판 없이
+ * 컬러 글리프만 쓰는 안도 함께 만들어 Teams 데스크탑과 모바일에서 실측했고,
+ * 배지 쪽이 채널 피드에서 종류가 먼저 잡혀 채택했다. 경위는 README 참고.
  */
 
 const fs = require('fs');
@@ -114,28 +118,19 @@ const COLORS = {
   failed: '#E5484D', aborted: '#6B7280',
 };
 
-// 스타일 D 전용 색 보정.
-// A는 색을 판에 칠하고 글리프를 흰색으로 쓰므로 어떤 색이든 대비가 확보되지만,
-// D는 글리프 자체가 그 색이라 어두운 회색이 다크 테마에서 묻힌다. 회색만 밝게 올린다.
-const COLORS_D = Object.assign({}, COLORS, { aborted: '#8C97A8' });
-
 const SIZE = 512;
 
-/** A — 색으로 채운 둥근 사각 배지 + 흰 글리프. */
-function styleA(name) {
+/**
+ * 색으로 채운 둥근 사각 배지 + 흰 글리프.
+ *
+ * 글리프를 흰색으로 고정하는 것이 핵심이다. PNG 는 뷰어의 테마에 반응하지 못하는데,
+ * 흰 글리프는 어떤 색 판 위에서도 대비가 확보되므로 라이트/다크 양쪽에서 똑같이 읽힌다.
+ */
+function badge(name) {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="${SIZE}" height="${SIZE}">`
     + `<rect x="1" y="1" width="46" height="46" rx="13" fill="${COLORS[name]}"/>`
     + `<g color="#ffffff">${GLYPHS[name]}</g></svg>`;
 }
-
-/** D — 배경판 없이 컬러 글리프만. 판이 없어 실루엣이 작아지므로 1.28배로 키운다. */
-function styleD(name) {
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="${SIZE}" height="${SIZE}">`
-    + `<g color="${COLORS_D[name]}" transform="translate(24 24) scale(1.28) translate(-24 -24)">`
-    + `${GLYPHS[name]}</g></svg>`;
-}
-
-const STYLES = { a: styleA, d: styleD };
 
 /**
  * Chrome 헤드리스가 스크린샷할 페이지. 배경을 투명하게 두고 SVG를 정확한 픽셀로 못박는다.
@@ -157,20 +152,16 @@ if (require.main === module) {
     console.error('usage: node icons.js <svgRoot> <htmlRoot>');
     process.exit(1);
   }
+  fs.mkdirSync(svgRoot, { recursive: true });
+  fs.mkdirSync(htmlRoot, { recursive: true });
   let count = 0;
-  for (const style of Object.keys(STYLES)) {
-    const svgDir = path.join(svgRoot, style);
-    const htmlDir = path.join(htmlRoot, style);
-    fs.mkdirSync(svgDir, { recursive: true });
-    fs.mkdirSync(htmlDir, { recursive: true });
-    for (const name of Object.keys(GLYPHS)) {
-      const svg = STYLES[style](name);
-      fs.writeFileSync(path.join(svgDir, `${name}.svg`), svg, 'utf8');
-      fs.writeFileSync(path.join(htmlDir, `${name}.html`), page(svg), 'utf8');
-      count += 1;
-    }
+  for (const name of Object.keys(GLYPHS)) {
+    const svg = badge(name);
+    fs.writeFileSync(path.join(svgRoot, `${name}.svg`), svg, 'utf8');
+    fs.writeFileSync(path.join(htmlRoot, `${name}.html`), page(svg), 'utf8');
+    count += 1;
   }
-  console.log(`wrote ${count} svg (${Object.keys(GLYPHS).length} glyphs x ${Object.keys(STYLES).length} styles)`);
+  console.log(`wrote ${count} svg`);
 }
 
-module.exports = { GLYPHS, COLORS, COLORS_D, STYLES, SIZE };
+module.exports = { GLYPHS, COLORS, badge, SIZE };
