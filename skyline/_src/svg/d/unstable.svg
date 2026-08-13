@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="512" height="512"><g color="#E8A317" transform="translate(24 24) scale(1.28) translate(-24 -24)">
+    <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3.4">
+      <circle cx="24" cy="24" r="13.2"/>
+    </g>
+    <g fill="currentColor">
+      <rect x="22.15" y="15.6" width="3.7" height="10.6" rx="1.85"/>
+      <circle cx="24" cy="30.6" r="2.25"/>
+    </g></g></svg>
